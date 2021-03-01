@@ -1,16 +1,16 @@
 import os
 import bs4
 import json
+from constants import DATA_DIR
 
-ARTICLE_PATH = './raw/pmwiki.php'
-SCRIPT_PATH = os.path.dirname(__file__)
+ARTICLE_PATH = os.path.join(DATA_DIR, 'raw', 'pmwiki.php')
 
 def get_trope_name(url):
     return url.split('/')[-1]
 
 KNOWN_TROPES = [
     get_trope_name(url)
-    for url in json.load(open(os.path.join(SCRIPT_PATH, 'trope_index', 'all_tropes.json')))
+    for url in json.load(open(os.path.join(DATA_DIR, 'trope_index', 'all_tropes.json')))
 ]
 
 def matches_trope(url):

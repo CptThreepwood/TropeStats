@@ -4,6 +4,8 @@ import json
 import time
 import requests
 
+from constants import DATA_DIR
+
 TROPE_LIST_BASE = "https://tvtropes.org/pmwiki/pagelist_having_pagetype_in_namespace.php?n=Main&t=trope"
 
 def get_trope_list_page(n=1):
@@ -18,7 +20,7 @@ def parse_tropes(content):
     ]
 
 def save_trope_page(content, i):
-    with open(os.path.join('./trope_index', 'page_{}.html'.format(i)), 'w') as html_io:
+    with open(os.path.join(DATA_DIR, 'trope_index', 'page_{}.html'.format(i)), 'w') as html_io:
         html_io.write(content)
 
 if __name__ == '__main__':
@@ -33,5 +35,5 @@ if __name__ == '__main__':
         time.sleep(1)
         content = get_trope_list_page(i)
         new_tropes = parse_tropes(content)
-    with open('./trope_index/all_tropes.json', 'w') as f:
+    with open(os.path.join(DATA_DIR, 'trope_index', 'all_tropes.json', 'w') as f:
         json.dump(tropes, f)
