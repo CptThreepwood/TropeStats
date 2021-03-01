@@ -2,8 +2,8 @@ import os
 import bs4
 import json
 
-from constants import HTML_DIR, TROPE_INDEX
 from typing import NamedTuple, List
+from .constants import HTML_DIR, TROPE_INDEX
 
 ## -------------------------------------------------------------------------------------
 ## Article Type
@@ -67,6 +67,7 @@ def get_internal_links(article: Article) -> List[Article]:
         and 'averted' not in str(item)
     ]
     return [
+        # Incase this is a relative link. If it's absolute this shouldn't break anything
         article_from_url(os.path.join(article.namespace, link['href']))
         for trope in list_items
         for link in trope.find_all('a', class_='twikilink')
@@ -95,6 +96,9 @@ def get_bigraph_links(article: Article) -> List[Article]:
         refs += get_bigraph_links(subpage)
 
     return { ref for ref in refs }
+
+def get_links(url: str) -> List[Article]:
+    return get_bigraph_links(article_from_url(url))
 
 if __name__ == '__main__':
     article = Article('Main', 'ActionGirl')
