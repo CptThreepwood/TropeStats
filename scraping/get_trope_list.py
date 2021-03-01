@@ -13,14 +13,14 @@ def get_trope_list_page(n=1):
     return response.content
 
 def parse_tropes(content):
-    soup = bs4.BeautifulSoup(content)
+    soup = bs4.BeautifulSoup(content, features="html.parser")
     return [
         link['href']
         for link in soup.find(id='main-article').find('table').find_all('a')
     ]
 
 def save_trope_page(content, i):
-    with open(os.path.join(TROPE_INDEX, 'page_{}.html'.format(i)), 'w') as html_io:
+    with open(os.path.join(TROPE_INDEX_DIR, 'page_{}.html'.format(i)), 'w') as html_io:
         html_io.write(content)
 
 if __name__ == '__main__':
