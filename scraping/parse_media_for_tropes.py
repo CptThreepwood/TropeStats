@@ -1,16 +1,14 @@
 import os
 import bs4
 import json
-from constants import DATA_DIR
-
-ARTICLE_PATH = os.path.join(DATA_DIR, 'raw', 'pmwiki.php')
+from constants import HTML_DIR, TROPE_INDEX
 
 def get_trope_name(url):
     return url.split('/')[-1]
 
 KNOWN_TROPES = [
     get_trope_name(url)
-    for url in json.load(open(os.path.join(DATA_DIR, 'trope_index', 'all_tropes.json')))
+    for url in json.load(open(TROPE_INDEX))
 ]
 
 def matches_trope(url):
@@ -30,7 +28,7 @@ def get_article_name(url):
     return '{}/{}'.format(url_path_tokens[-2], url_path_tokens[-1])
 
 def open_article(article):
-    article_name = os.path.join(ARTICLE_PATH, article + '.html')
+    article_name = os.path.join(HTML_DIR, article + '.html')
     with open(article_name, 'r', encoding='iso-8859-1') as article_io:
         return article_io.read()
 
