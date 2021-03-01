@@ -101,6 +101,4 @@ ENV/
 .mypy_cache/
 
 # data
-*.json
-*.html
 data/
