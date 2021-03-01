@@ -35,5 +35,5 @@ if __name__ == '__main__':
         time.sleep(1)
         content = get_trope_list_page(i)
         new_tropes = parse_tropes(content)
-    with open(os.path.join(TROPE_INDEX, 'w') as f:
+    with open(TROPE_INDEX, 'w') as f:
         json.dump(tropes, f)
