@@ -1,39 +1,65 @@
 import os
 import bs4
 import json
-from constants import HTML_DIR, TROPE_INDEX
 
-def get_trope_name(url):
-    return url.split('/')[-1]
+from constants import HTML_DIR, TROPE_INDEX
+from typing import NamedTuple, List
+
+## -------------------------------------------------------------------------------------
+## Article Type
+
+class Article(NamedTuple):
+    namespace: str
+    name: str
+
+def article_from_url(url: str) -> Article:
+    path, _ = os.path.splitext(url)
+    name = os.path.basename(path)
+    namespace = os.path.basename(os.path.dirname(path))
+    return Article(namespace, name)
+
+## -------------------------------------------------------------------------------------
+## Load Tropes
+
+def get_trope_name(url: str) -> str:
+    return os.path.basename(os.path.splitext(url)[0])
 
 KNOWN_TROPES = [
     get_trope_name(url)
     for url in json.load(open(TROPE_INDEX))
 ]
 
-def matches_trope(url):
-    url_path_tokens = url.split('/')
-    return any(
-        (url_path_tokens[-1] == trope_name) or (url_path_tokens[-2] == trope_name)
-        for trope_name in KNOWN_TROPES
-    )
+## -------------------------------------------------------------------------------------
+## Article Type Tests
 
-def matches_subpage(url, article):
-    url_path_tokens = url.split('/')
-    [media_type, media_name] = article.split('/')
-    return media_name == url_path_tokens[-2]
+def is_trope_namespace(article: Article) -> bool:
+    return (article.namespace in KNOWN_TROPES)
 
-def get_article_name(url):
-    url_path_tokens = url.split('/')
-    return '{}/{}'.format(url_path_tokens[-2], url_path_tokens[-1])
+def is_trope(article: Article) -> bool:
+    return (article.name in KNOWN_TROPES) or is_trope_namespace(article)
 
-def open_article(article):
-    article_name = os.path.join(HTML_DIR, article + '.html')
+def is_subpage(linked_article: Article, article: Article) -> bool:
+    '''
+        Test if the linked article is a subpage of the given article
+        Relies on the article not being named something generic in the namespace
+        This is common in trope namespaces (e.g. ActionGirl/Literature)
+        so we explicitly check for trope namespace
+    '''
+    return not is_trope_namespace(article) and linked_article.namespace == article.name
+
+## -------------------------------------------------------------------------------------
+## Article IO
+
+def open_article(article: Article) -> str:
+    article_name = os.path.join(HTML_DIR, article.namespace, article.name + '.html')
     with open(article_name, 'r', encoding='iso-8859-1') as article_io:
         return article_io.read()
 
-def get_internal_links(html):
-    soup = bs4.BeautifulSoup(html, features="html.parser")
+## -------------------------------------------------------------------------------------
+## Article Parsing
+
+def get_internal_links(article: Article) -> List[Article]:
+    soup = bs4.BeautifulSoup(open_article(article), features="html.parser")
 
     list_items = [
         item for item in soup.find_all('li')
@@ -41,43 +67,38 @@ def get_internal_links(html):
         and 'averted' not in str(item)
     ]
     return [
-        link['href']
+        article_from_url(os.path.join(article.namespace, link['href']))
         for trope in list_items
         for link in trope.find_all('a', class_='twikilink')
         if 'href' in link.attrs
     ]
 
-def get_bigraph_links(article):
+def get_bigraph_links(article: Article) -> List[Article]:
     '''
         Returns the references to media if a trope page
         and the references to tropes on a media page.
         It should be smart enough to go to any subpages
     '''
-    internal_links = get_internal_links(open_article(article))
+    internal_links = get_internal_links(article)
 
     subpages = [
-        get_article_name(link)
-        for link in internal_links
-        if matches_subpage(link, article)
+        link for link in internal_links
+        if is_subpage(link, article)
     ]
     refs = [
-        link
-        for link in internal_links
-        if (not matches_trope(article) and matches_trope(link))
-        or (matches_trope(article) and not matches_trope(link))
+        link for link in internal_links
+        if (not is_trope(article) and is_trope(link))
+        or (is_trope(article) and not is_trope(link))
     ]
 
     for subpage in subpages:
         refs += get_bigraph_links(subpage)
 
-    return {
-        os.path.basename(ref)
-        for ref in refs
-    }
+    return { ref for ref in refs }
 
 if __name__ == '__main__':
-    # article = 'Main/ActionGirl'
-    article = 'WesternAnimation/AvatarTheLastAirbender'
+    article = Article('Main', 'ActionGirl')
+    # article = Article('WesternAnimation', 'AvatarTheLastAirbender')
     try:
         test_tropes = get_bigraph_links(article)
         print(sorted(list(test_tropes)))
