@@ -20,33 +20,70 @@ def matches_trope(url):
         for trope_name in KNOWN_TROPES
     )
 
+def matches_subpage(url, article):
+    url_path_tokens = url.split('/')
+    [media_type, media_name] = article.split('/')
+    return media_name == url_path_tokens[-2]
+
+def get_article_name(url):
+    url_path_tokens = url.split('/')
+    return '{}/{}'.format(url_path_tokens[-2], url_path_tokens[-1])
+
 def open_article(article):
     article_name = os.path.join(ARTICLE_PATH, article + '.html')
-    print(article_name)
     with open(article_name, 'r', encoding='iso-8859-1') as article_io:
         return article_io.read()
 
-def get_tropes_in_article(article):
-    soup = bs4.BeautifulSoup(open_article(article), features="html.parser")
+def get_internal_links(html):
+    soup = bs4.BeautifulSoup(html, features="html.parser")
 
-    tropes = [
+    list_items = [
         item for item in soup.find_all('li')
         if len(item.find_all('a', class_='twikilink')) > 0
         and 'averted' not in str(item)
     ]
-    refs = [
+    return [
         link['href']
-        for trope in tropes
+        for trope in list_items
         for link in trope.find_all('a', class_='twikilink')
         if 'href' in link.attrs
-        if matches_trope(link['href'])
     ]
+
+def get_bigraph_links(article):
+    '''
+        Returns the references to media if a trope page
+        and the references to tropes on a media page.
+        It should be smart enough to go to any subpages
+    '''
+    internal_links = get_internal_links(open_article(article))
+
+    subpages = [
+        get_article_name(link)
+        for link in internal_links
+        if matches_subpage(link, article)
+    ]
+    refs = [
+        link
+        for link in internal_links
+        if (not matches_trope(article) and matches_trope(link))
+        or (matches_trope(article) and not matches_trope(link))
+    ]
+
+    for subpage in subpages:
+        refs += get_bigraph_links(subpage)
+
     return {
         os.path.basename(ref)
         for ref in refs
     }
 
 if __name__ == '__main__':
-    test_tropes = get_tropes_in_article('Anime/AceAttorney')
-    print(sorted(list(test_tropes)))
-    print(len(test_tropes))
+    # article = 'Main/ActionGirl'
+    article = 'WesternAnimation/AvatarTheLastAirbender'
+    try:
+        test_tropes = get_bigraph_links(article)
+        print(sorted(list(test_tropes)))
+        print(len(test_tropes))
+    except FileNotFoundError as err:
+        print('Failed to parse {}'.format(article))
+        print(err)
