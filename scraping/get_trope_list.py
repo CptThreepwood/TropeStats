@@ -4,7 +4,7 @@ import json
 import time
 import requests
 
-from constants import TROPE_INDEX, TROPE_INDEX_DIR
+from ..config import TROPE_INDEX, TROPE_INDEX_DIR
 
 TROPE_LIST_BASE = "https://tvtropes.org/pmwiki/pagelist_having_pagetype_in_namespace.php?n=Main&t=trope"
 

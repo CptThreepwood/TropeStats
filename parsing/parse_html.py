@@ -3,7 +3,7 @@ import bs4
 import json
 
 from typing import NamedTuple, List
-from .constants import HTML_DIR, TROPE_INDEX
+from ..config import HTML_DIR, TROPE_INDEX
 
 ## -------------------------------------------------------------------------------------
 ## Article Type

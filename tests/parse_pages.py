@@ -3,8 +3,8 @@ import unittest
 
 import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir)))
-import scraping.parse_media_for_tropes
-scraping.parse_media_for_tropes.HTML_DIR = os.path.join(os.path.dirname(__file__), 'fixtures')
+import parsing.parse_html
+parsing.parse_html.HTML_DIR = os.path.join(os.path.dirname(__file__), 'fixtures')
 
 class TestParsing(unittest.TestCase):
 
