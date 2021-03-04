@@ -4,7 +4,7 @@ import json
 import time
 import requests
 
-from ..config import TROPE_INDEX, TROPE_INDEX_DIR
+from config import TROPE_INDEX, TROPE_INDEX_DIR
 
 TROPE_LIST_BASE = "https://tvtropes.org/pmwiki/pagelist_having_pagetype_in_namespace.php?n=Main&t=trope"
 
@@ -23,7 +23,7 @@ def save_trope_page(content, i):
     with open(os.path.join(TROPE_INDEX_DIR, 'page_{}.html'.format(i)), 'wb') as html_io:
         html_io.write(content)
 
-if __name__ == '__main__':
+def download_trope_index():
     i = 1
     tropes = []
     content = get_trope_list_page(i)

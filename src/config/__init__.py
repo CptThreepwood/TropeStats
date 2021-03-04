@@ -1,6 +1,6 @@
 import os
 
-ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir))
+ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir, os.path.pardir))
 DATA_DIR = os.path.join(ROOT_DIR, 'data')
 HTML_DIR = os.path.join(DATA_DIR, 'raw')
 PARSED_DIR = os.path.join(DATA_DIR, 'parsed')
