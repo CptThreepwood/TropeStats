@@ -98,7 +98,7 @@ def get_bigraph_links(article: Article) -> List[Article]:
     return { ref for ref in refs }
 
 def get_links(url: str) -> List[Article]:
-    return get_bigraph_links(article_from_url(url))
+    return list(get_bigraph_links(article_from_url(url)))
 
 if __name__ == '__main__':
     article = Article('Main', 'ActionGirl')
