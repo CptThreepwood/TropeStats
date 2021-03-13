@@ -32,15 +32,14 @@ def download_and_store(line):
         return
     if not os.path.exists(os.path.dirname(outfile)):
         os.makedirs(os.path.dirname(outfile))
+    print(outfile)
     with open(outfile, 'wb') as out_io:
         out_io.write(download_url(url))
 
 if __name__ == '__main__':
     log_file = get_latest_log()
-    print(log_file)
     with open(log_file, 'r') as log_io:
         for line in log_io.readlines():
             if 'No such file' in line:
-                print(line)
                 download_and_store(line)
 
