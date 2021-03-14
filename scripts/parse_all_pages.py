@@ -1,6 +1,6 @@
 import os
 import glob
-import json
+import yaml
 import time
 import logging
 
@@ -16,7 +16,7 @@ successes = 0
 failures = 0
 missing = 0
 for article in articles:
-    outname = os.path.splitext(article.replace(HTML_DIR, PARSED_DIR))[0] + '.json'
+    outname = os.path.splitext(article.replace(HTML_DIR, PARSED_DIR))[0] + '.yaml'
     if os.path.exists(outname):
         continue
     if not os.path.exists(os.path.dirname(outname)):
@@ -35,7 +35,7 @@ for article in articles:
         with open(outname, 'w') as out:
             print('Success:', outname)
             successes += 1
-            json.dump(bigraph_links, out)
+            yaml.dump(bigraph_links, out)
 
 print('Successfully parsed {0} pages'.format(successes))
 print('Missing {0} files required for {1} pages'.format(missing, failures))

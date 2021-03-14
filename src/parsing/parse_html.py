@@ -3,7 +3,7 @@ import bs4
 import yaml
 
 from typing import NamedTuple, List
-from config import HTML_DIR, TROPE_INDEX
+from config import HTML_DIR, TROPE_INDEX, MEDIA_INDEX, IGNORED_INDEX
 
 ## -------------------------------------------------------------------------------------
 ## Article Type
@@ -29,6 +29,14 @@ KNOWN_TROPES = [
     for url in yaml.load(open(TROPE_INDEX), Loader=yaml.SafeLoader)
 ]
 
+KNOWN_MEDIA = [
+    name for name in yaml.load(open(MEDIA_INDEX), Loader=yaml.SafeLoader)
+]
+
+IGNORED_PAGES = [
+    name for name in yaml.load(open(IGNORED_INDEX), Loader=yaml.SafeLoader)
+]
+
 ## -------------------------------------------------------------------------------------
 ## Article Type Tests
 
@@ -38,6 +46,12 @@ def is_trope_namespace(article: Article) -> bool:
 def is_trope(article: Article) -> bool:
     return (article.name in KNOWN_TROPES) or is_trope_namespace(article)
 
+def is_ignored(article: Article) -> bool:
+    return (any(page == article.name or page == article.namespace) for page in IGNORED_PAGES)
+
+def is_media(article: Article) -> bool:
+    return (article.namespace in KNOWN_MEDIA)
+
 def is_subpage(linked_article: Article, article: Article) -> bool:
     '''
         Test if the linked article is a subpage of the given article
@@ -45,7 +59,11 @@ def is_subpage(linked_article: Article, article: Article) -> bool:
         This is common in trope namespaces (e.g. ActionGirl/Literature)
         so we explicitly check for trope namespace
     '''
-    return not is_trope_namespace(article) and linked_article.namespace == article.name
+    return (
+        linked_article.namespace == article.name
+        and not is_trope_namespace(article)
+        and not is_ignored(article)
+    )
 
 ## -------------------------------------------------------------------------------------
 ## Article IO
@@ -80,6 +98,8 @@ def get_bigraph_links(article: Article) -> List[Article]:
         and the references to tropes on a media page.
         It should be smart enough to go to any subpages
     '''
+    if not (is_ignored(article) or is_media(article) or is_trope(article)):
+        print('Unknown Page Type: ', article)
     try:
         internal_links = get_internal_links(article)
 
