@@ -12,6 +12,9 @@ class Article(NamedTuple):
     namespace: str
     name: str
 
+    def to_string(self):
+        return '/'.join([self.namespace, self.name])
+
 def article_from_url(url: str) -> Article:
     path, _ = os.path.splitext(url)
     name = os.path.basename(path)
@@ -47,7 +50,7 @@ def is_trope(article: Article) -> bool:
     return (article.name in KNOWN_TROPES) or is_trope_namespace(article)
 
 def is_ignored(article: Article) -> bool:
-    return (any(page == article.name or page == article.namespace) for page in IGNORED_PAGES)
+    return any((page == article.name or page == article.namespace) for page in IGNORED_PAGES)
 
 def is_media(article: Article) -> bool:
     return (article.namespace in KNOWN_MEDIA)
@@ -99,7 +102,7 @@ def get_bigraph_links(article: Article) -> List[Article]:
         It should be smart enough to go to any subpages
     '''
     if not (is_ignored(article) or is_media(article) or is_trope(article)):
-        print('Unknown Page Type: ', article)
+        raise TypeError('Unknown Page Type: ', article)
     try:
         internal_links = get_internal_links(article)
 
@@ -120,8 +123,8 @@ def get_bigraph_links(article: Article) -> List[Article]:
     except FileNotFoundError as err:
         return { Article('Err/Missing', article) }
 
-def get_links(url: str) -> List[Article]:
-    return list(get_bigraph_links(article_from_url(url)))
+def get_links(url: str) -> List[str]:
+    return [article.to_string() for article in get_bigraph_links(article_from_url(url))]
 
 if __name__ == '__main__':
     #article = Article('Main', 'ActionGirl')
