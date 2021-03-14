@@ -8,6 +8,15 @@ from config import HTML_DIR, TROPE_INDEX, MEDIA_INDEX, IGNORED_INDEX
 ## -------------------------------------------------------------------------------------
 ## Article Type
 
+MISSING_SPACE = 'Err/Missing'
+
+class MissingArticlesError(Exception):
+    def __init__(self, articles):
+        self.articles = articles
+
+## -------------------------------------------------------------------------------------
+## Article Type
+
 class Article(NamedTuple):
     namespace: str
     name: str
@@ -101,8 +110,6 @@ def get_bigraph_links(article: Article) -> List[Article]:
         and the references to tropes on a media page.
         It should be smart enough to go to any subpages
     '''
-    if not (is_ignored(article) or is_media(article) or is_trope(article)):
-        raise TypeError('Unknown Page Type: ', article)
     try:
         internal_links = get_internal_links(article)
 
@@ -121,10 +128,14 @@ def get_bigraph_links(article: Article) -> List[Article]:
 
         return { ref for ref in refs }
     except FileNotFoundError as err:
-        return { Article('Err/Missing', article) }
+        return { Article(MISSING_SPACE, article.to_string()) }
 
 def get_links(url: str) -> List[str]:
-    return [article.to_string() for article in get_bigraph_links(article_from_url(url))]
+    links = get_bigraph_links(article_from_url(url))
+    missing_files = [link.name for link in links if link.namespace == MISSING_SPACE]
+    if len(missing_files) > 0:
+        raise MissingArticlesError(missing_files)
+    return [link.to_string() for link in links]
 
 if __name__ == '__main__':
     #article = Article('Main', 'ActionGirl')
