@@ -1,6 +1,6 @@
 import os
 import bs4
-import json
+import yaml
 import time
 import requests
 
@@ -36,4 +36,4 @@ def download_trope_index():
         content = get_trope_list_page(i)
         new_tropes = parse_tropes(content)
     with open(TROPE_INDEX, 'w') as f:
-        json.dump(tropes, f)
+        yaml.dump(tropes, f)

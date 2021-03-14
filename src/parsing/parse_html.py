@@ -1,6 +1,6 @@
 import os
 import bs4
-import json
+import yaml
 
 from typing import NamedTuple, List
 from config import HTML_DIR, TROPE_INDEX
@@ -26,7 +26,7 @@ def get_trope_name(url: str) -> str:
 
 KNOWN_TROPES = [
     get_trope_name(url)
-    for url in json.load(open(TROPE_INDEX))
+    for url in yaml.load(open(TROPE_INDEX), Loader=yaml.SafeLoader)
 ]
 
 ## -------------------------------------------------------------------------------------
