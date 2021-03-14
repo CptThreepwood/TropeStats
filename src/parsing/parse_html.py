@@ -80,28 +80,32 @@ def get_bigraph_links(article: Article) -> List[Article]:
         and the references to tropes on a media page.
         It should be smart enough to go to any subpages
     '''
-    internal_links = get_internal_links(article)
+    try:
+        internal_links = get_internal_links(article)
 
-    subpages = [
-        link for link in internal_links
-        if is_subpage(link, article)
-    ]
-    refs = [
-        link for link in internal_links
-        if (not is_trope(article) and is_trope(link))
-        or (is_trope(article) and not is_trope(link))
-    ]
+        subpages = [
+            link for link in internal_links
+            if is_subpage(link, article)
+        ]
+        refs = [
+            link for link in internal_links
+            if (not is_trope(article) and is_trope(link))
+            or (is_trope(article) and not is_trope(link))
+        ]
 
-    for subpage in subpages:
-        refs += get_bigraph_links(subpage)
+        for subpage in subpages:
+            refs += get_bigraph_links(subpage)
 
-    return { ref for ref in refs }
+        return { ref for ref in refs }
+    except FileNotFoundError as err:
+        return { Article('Err/Missing', article) }
 
 def get_links(url: str) -> List[Article]:
     return list(get_bigraph_links(article_from_url(url)))
 
 if __name__ == '__main__':
-    article = Article('Main', 'ActionGirl')
+    #article = Article('Main', 'ActionGirl')
+    article = Article('OurDragonsAreDifferent', 'Literature') # Test namespace
     # article = Article('WesternAnimation', 'AvatarTheLastAirbender')
     try:
         test_tropes = get_bigraph_links(article)
