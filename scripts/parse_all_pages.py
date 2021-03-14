@@ -11,6 +11,7 @@ import parsing.parse_html as parse
 ## Setup logging
 file_handler = logging.FileHandler('logs/parse_html_{}.log'.format(time.time()))
 file_handler.setLevel(logging.DEBUG)
+file_handler.setFormatter('%(asctime)s - %(message)s')
 
 console_handler = logging.StreamHandler(sys.stdout)
 console_handler.setLevel(logging.DEBUG)
