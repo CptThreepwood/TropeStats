@@ -33,21 +33,13 @@ def article_from_url(url: str) -> Article:
 ## -------------------------------------------------------------------------------------
 ## Load Tropes
 
-def get_trope_name(url: str) -> str:
-    return os.path.basename(os.path.splitext(url)[0])
+def load_config(filename):
+    with open(filename) as fio:
+        return [ name for name in yaml.load(fio, Loader=yaml.SafeLoader) ]
 
-KNOWN_TROPES = [
-    get_trope_name(url)
-    for url in yaml.load(open(TROPE_INDEX), Loader=yaml.SafeLoader)
-]
-
-KNOWN_MEDIA = [
-    name for name in yaml.load(open(MEDIA_INDEX), Loader=yaml.SafeLoader)
-]
-
-IGNORED_PAGES = [
-    name for name in yaml.load(open(IGNORED_INDEX), Loader=yaml.SafeLoader)
-]
+KNOWN_TROPES = load_config(TROPE_INDEX)
+KNOWN_MEDIA = load_config(MEDIA_INDEX)
+IGNORED_PAGES = load_config(IGNORED_INDEX)
 
 ## -------------------------------------------------------------------------------------
 ## Article Type Tests
