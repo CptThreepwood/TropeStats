@@ -12,10 +12,13 @@ def get_trope_list_page(n=1):
     response = requests.get('{}&page={}'.format(TROPE_LIST_BASE, n))
     return response.content
 
+def get_trope_name(url: str) -> str:
+    return os.path.basename(os.path.splitext(url)[0])
+
 def parse_tropes(content):
     soup = bs4.BeautifulSoup(content, features="html.parser")
     return [
-        link['href']
+        get_trope_name(link['href'])
         for link in soup.find(id='main-article').find('table').find_all('a')
     ]
 
