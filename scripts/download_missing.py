@@ -27,7 +27,7 @@ def get_latest_log():
 
 def download_and_store(line):
     article, url = get_url(line)
-    outfile = os.path.join(HTML_DIR, article)
+    outfile = os.path.join(HTML_DIR, os.path.splitext(article)[0] + '.html')
     if os.path.exists(outfile):
         return
     if not os.path.exists(os.path.dirname(outfile)):

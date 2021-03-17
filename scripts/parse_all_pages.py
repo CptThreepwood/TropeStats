@@ -11,7 +11,6 @@ import parsing.parse_html as parse
 ## Setup logging
 file_handler = logging.FileHandler('logs/parse_html_{}.log'.format(time.time()))
 file_handler.setLevel(logging.DEBUG)
-file_handler.setFormatter('%(asctime)s - %(message)s')
 
 console_handler = logging.StreamHandler(sys.stdout)
 console_handler.setLevel(logging.DEBUG)
@@ -57,8 +56,8 @@ for article in articles:
         logger.info('Failed')
         logger.error('Failed to parse {}'.format(article))
         missing += len(err.articles)
-        for article in articles:
-            logger.error('No such file {0}'.format(article))
+        for miss in err.articles:
+            logger.error('No such file {0}'.format(miss))
 
 logger.info('Successfully parsed {0} pages'.format(successes))
 logger.info('Missing {0} files required for {1} pages'.format(missing, failures))
