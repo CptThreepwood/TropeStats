@@ -1,6 +1,6 @@
 import os
 
-from typing import NamedTuple
+from typing import NamedTuple, Optional
 from constants import KNOWN_MEDIA, KNOWN_TROPES, IGNORED_PAGES
 
 ## -------------------------------------------------------------------------------------
@@ -31,6 +31,13 @@ class Article(NamedTuple):
 
     def is_trope(self) -> bool:
         return (self.name in KNOWN_TROPES) or self.is_trope_namespace()
+
+    def trope_name(self) -> Optional[str]:
+        if not self.is_trope():
+            return None
+        if self.is_trope_namespace():
+            return self.namespace
+        return self.name
 
     def is_ignored(self) -> bool:
         return any((page == self.name or page == self.namespace) for page in IGNORED_PAGES)
