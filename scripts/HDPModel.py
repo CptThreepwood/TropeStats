@@ -31,8 +31,11 @@ def create_logger(name):
 def get_all_articles(pattern):
     articles = get_matching_articles(os.path.join(PARSED_DIR, pattern, '*.yaml'))
     return [
-        [trope.name for trope in load_parsed(article)]
-        for article in articles
+        [
+            trope.trope_name()
+            for trope in load_parsed(article)
+            if trope.is_trope()
+        ] for article in articles
     ]
 
 def make_model():
@@ -94,5 +97,6 @@ def train_model(article_pattern):
 
 if __name__ == '__main__':
     for pattern in KNOWN_MEDIA:
-        train_model(pattern)
+        if pattern > 'TabletopGame':
+            train_model(pattern)
     train_model('*')
