@@ -55,8 +55,8 @@ def make_model():
     )
 
 def train_model(article_pattern):
-    docs = get_all_articles(article_pattern)
     logger = create_logger(article_pattern)
+    docs = get_all_articles(article_pattern)
 
     model = make_model()
     for doc in docs:
@@ -97,6 +97,5 @@ def train_model(article_pattern):
 
 if __name__ == '__main__':
     for pattern in KNOWN_MEDIA:
-        if pattern > 'TabletopGame':
-            train_model(pattern)
+        train_model(pattern)
     train_model('*')
